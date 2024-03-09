@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +12,124 @@
     <link rel="stylesheet" href="/styles/queries.css">
     <title>Dashboard</title>
 </head>
-<body>
-    
+
+<body class="primary-lighter-bg">
+    <header class="header">
+        <section class="navbar flex space-between off-white-bg">
+            <a href="#">
+                <img class="logo" alt="logo" src="" />
+            </a>
+            <nav class="main-nav">
+                <ul class="nav-list flex center">
+                    <li><a id="logout-btn" class="nav-btn" href="#">Sign Out</a></li>
+                </ul>
+            </nav>
+
+        </section>
+        <section class="hero">
+            <div class="hero-container flex">
+                <div class="hero-container-inner flex column primary-text">
+                    <h1>Welcome <span id="user-greet">Georges</span></h1>
+                    <p>Your Current Balance is <span>10000.00</span><span> USD</span></p>
+                </div>
+            </div>
+        </section>
+    </header>
+    <section class="main flex column center">
+        <div class="filters flex space-between primary-text">
+            <div class="type-filters flex">
+                <i class="fa-regular fa-filter primary-text"></i>
+                <p>Filters:</p>
+                <span id="income-filter">Income</span>
+                <span id="expense-filter">Expenses</span>
+            </div>
+            <div>
+                <input type="number" id="amount-from-filter" placeholder="Amount from">
+                <input type="number" id="amount-to-filter" placeholder="Amount to">
+                <select id="currency-filter" class="primary-lighter-bg">
+                    <option value="">All</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                </select>
+            </div>
+        </div>
+        <div class="table flex center">
+            <table class="primary-bg">
+                <thead class="primary-text">
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Currency</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="primary-text">
+                    <tr>
+                        <td>#1</td>
+                        <td>Income</td>
+                        <td>Healthcare</td>
+                        <td>12 - 01 - 2024</td>
+                        <td>200</td>
+                        <td>USD</td>
+                        <td><i class="fa-regular fa-square-minus"></i></td>
+                    </tr>
+                    <tr>
+                        <td>#2</td>
+                        <td>Expense</td>
+                        <td>Groceries</td>
+                        <td>12 - 01 - 2024</td>
+                        <td>500</td>
+                        <td>EUR</td>
+                        <td><i class="fa-regular fa-square-minus"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <section id="modal-bg">
+        <div class="hidden modal center column primary-text primary-bg" id="add-transaction-modal">
+            <h3>Add a Transaction</h3>
+            <div class="modal-content flex column center primary-bg">
+                <input type="date" id="dateInput" placeholder="Transaction date">
+                <input type="number" id="amountInput" placeholder="Amount">
+                <div>
+                    <select id="descriptionInput">
+                        <option value="X">Groceries</option>
+                        <option value="x">Healthcare</option>
+                    </select>
+                </div>
+                <div>
+                    <select id="currencyInput">
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                    </select>
+                </div>
+                <div id="typeInput" class="type-input">
+                    <div class="flex center">
+                        <div class="flex center">
+                            <input type="checkbox" id="incomeCheckbox" value="Income" checked>
+                            <label for="incomeCheckbox">Income</label><br>
+                        </div>
+                        <div class="flex center">
+                            <input type="checkbox" id="expenseCheckbox" value="Expense">
+                            <label for="expenseCheckbox">Expense</label><br>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-btns flex center">
+                    <button id="submit-transaction-btn" class="add-transaction-btn primary-bg">Add</button>
+                    <button id="cancel-add-transaction-btn" class="add-transaction-btn primary-bg">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="add-btn primary-bg primary-text flex center" id="add-transaction-btn">
+        <i class="fa-solid fa-plus"></i>
+    </div>
+    <script src="/scripts/index.js"></script>
 </body>
+
 </html>
