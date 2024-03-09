@@ -1,46 +1,16 @@
 const form = document.getElementById('transactionForm');
+const transactionsContainer = document.getElementById('transactions-Container');
 
-const availableTransactions = [
-  {
-    id: 1,
-    date: new Date(2024, 1, 20),
-    amount: 75.2,
-    description: 'Groceries',
-    notes: 'Weekly grocery shopping',
-    type: 'Expense',
-  },
-  {
-    id: 2,
-    date: new Date(2024, 3, 15),
-    amount: 50.0,
-    description: 'Transportation',
-    notes: 'Uber ride to work',
-    type: 'Expense',
-  },
-  {
-    id: 3,
-    date: new Date(2024, 4, 10),
-    amount: 120.0,
-    description: 'Dining Out',
-    notes: 'Dinner with friends',
-    type: 'Expense',
-  },
-  {
-    id: 4,
-    date: new Date(2024, 5, 5),
-    amount: 1000.0,
-    description: 'Salary',
-    notes: 'Monthly paycheck',
-    type: 'Income',
-  },
-];
+let currentUser = null;
+let currentUserTransactions = [];
+let fitleredTransactions = [];
 
 const defaultTransaction = {
   id: getUniqueId(),
   date: new Date(),
   amount: null,
+  currency: 'USD',
   description: null,
-  notes: null,
   type: null,
 };
 
@@ -60,7 +30,7 @@ const descriptions = [
 
 const users = [user1];
 
-const user = {
+const defaultUser = {
   id: getUniqueId(users),
   name: null,
   lastName: null,
@@ -78,32 +48,32 @@ const user1 = {
       id: 1,
       date: new Date(2024, 1, 20),
       amount: 75.2,
+      currency: 'USD',
       description: 'Groceries',
-      notes: 'Weekly grocery shopping',
       type: 'Expense',
     },
     {
       id: 2,
       date: new Date(2024, 3, 15),
       amount: 50.0,
+      currency: 'USD',
       description: 'Transportation',
-      notes: 'Uber ride to work',
       type: 'Expense',
     },
     {
       id: 3,
       date: new Date(2024, 4, 10),
       amount: 120.0,
+      currency: 'USD',
       description: 'Dining Out',
-      notes: 'Dinner with friends',
       type: 'Expense',
     },
     {
       id: 4,
       date: new Date(2024, 5, 5),
       amount: 1000.0,
+      currency: 'USD',
       description: 'Salary',
-      notes: 'Monthly paycheck',
       type: 'Income',
     },
   ],
@@ -111,10 +81,9 @@ const user1 = {
 
 const types = ['Income', 'Expense'];
 
-let currentUser = null;
-
 const loadCurrentUser = () => {
   if ((currentUser = JSON.parse(localStorage.getItem('currentUser')))) {
+    currentUserTransactions = currentUser.transactions;
     console.log('current in home', currentUser);
   }
 };
@@ -142,11 +111,22 @@ const calculateBalance = (transactions) => {
   return balance;
 };
 
-const addTransaction = (user, transaction) => {
+const populateTransaction = (transaction) => {
+  transactionsContainer.innerHTML += ``;
+};
+
+const populateTransactions = (transactions) => {
+  transactionsContainer.innerHTML = '';
+  transactions.forEach((transaction) => {
+    populateTransaction(transaction);
+  });
+};
+
+const addTransactionToUser = (user, transaction) => {
   user.transactions.push(transaction);
 };
 
-const createTransaction = () => {
+const createTransactionFromInput = () => {
   const dateInput = new Date(document.getElementById('dateInput').value);
   const amountInput = parseFloat(document.getElementById('amountInput').value);
   const descriptionInput = document.getElementById('descriptionInput').value;
@@ -163,13 +143,50 @@ const createTransaction = () => {
   };
 };
 
+const removeTransation = (user, transactionToRemove) => {
+  user.transaction = user.transactions.filter((transaction) => transaction !== transactionToRemove);
+};
+
+const editTransaction = (user, transactionId, updatedTransaction) => {
+  const transaction = user.transactions.find((transaction) => transaction.id === transactionId);
+  if (transaction) {
+    for (let property in updatedTransaction) {
+      transaction[property] = updatedTransaction[property];
+    }
+  } else {
+    throw new Error('Transaction not Found');
+  }
+};
+
+// Filters
+
+const filterByTransactionType = (type, transactions) => {
+  const filterResult = transactions.filter((transaction) => transaction.type === type) || currentUserTransactions;
+  populateTransactions(filterResult.length > 0 ? filterResult : currentUserTransactions);
+};
+
+const filterByAmountTo = (amountTo, transactions) => {
+  const filterResult = transactions.filter((transaction) => transaction.amount <= amountTo) || currentUserTransactions;
+  populateTransactions(filterResult.length > 0 ? filterResult : currentUserTransactions);
+};
+
+const filterByAmountFrom = (amountFrom, transactions) => {
+  const filterResult = transactions.filter((transaction) => transaction.amount > amountFrom) || currentUserTransactions;
+  populateTransactions(filterResult.length > 0 ? filterResult : currentUserTransactions);
+};
+
+const filterByCurrency = (currency, transactions) => {
+  const filterResult = transactions.filter((transaction) => transaction.currency === currency) || currentUserTransactions;
+  populateTransactions(filterResult.length > 0 ? filterResult : currentUserTransactions);
+};
+
 // Add Transaction-Form Listener
 form.addEventListener('submit', function (event) {
   event.preventDefault();
 
-  const transaction = createTransaction();
+  const transaction = createTransactionFromInput();
 
-  addTransaction(user, transaction);
+  addTransactionToUser(currentUser, transaction);
 
   form.reset();
 });
