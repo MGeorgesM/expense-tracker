@@ -140,6 +140,15 @@ tr th {
   width: auto;
 }
 
+.table-actions {
+  gap: 8px
+}
+
+.table-actions i:hover {
+  cursor: pointer;
+  color: #8193c0;
+}
+
 .add-btn {
   position: fixed;
   bottom: 24px;
@@ -154,7 +163,7 @@ tr th {
   scale: 1.25;
 }
 
-/* .modal-bg {
+/* .add-edit-transaction-modal-bg {
   position: fixed;
   top: 0;
 
@@ -163,7 +172,8 @@ tr th {
   background-color: blanchedalmond;
 } */
 
-.modal {
+.add-edit-transaction-modal,
+.confirmation-modal {
   width: 300px;
   display: flex;
   position: fixed;
@@ -178,36 +188,41 @@ tr th {
   transition: opacity 0.3s ease; */
 }
 
-.modal.show {
+.add-edit-transaction-modal.show {
   opacity: 1;
 }
 
 
-.modal h3 {
+.add-edit-transaction-modal h3 {
   font-size: 20px;
   padding-top: 24px;
   padding-bottom: 8px;
   font-weight: 400;
 }
 
-.modal-content {
+.confirmation-modal h3 {
+  font-size: 20px;
+  padding: 24px;
+}
+
+.add-edit-transaction-modal-content {
   padding: 20px;
   border-radius: 12px;
   gap: 16px;
 }
 
-.modal-content div {
+.add-edit-transaction-modal-content div {
   width: 100%;
 }
 
-.modal-content select {
+.add-edit-transaction-modal-content select {
   cursor: pointer;
   width: 100%;
 }
 
 
-.modal-content input,
-.modal-content select {
+.add-edit-transaction-modal-content input,
+.add-edit-transaction-modal-content select {
   cursor: pointer;
   width: 100%;
 }
@@ -224,11 +239,11 @@ tr th {
   gap: 8px;
 }
 
-.modal-btns {
+.add-edit-transaction-modal-btns {
   gap: 8px;
 }
 
-.modal-btns button:hover {
+.add-edit-transaction-modal-btns button:hover {
   border-color: #8193c0;
   color: #8193c0;
   cursor: pointer;
@@ -246,7 +261,7 @@ tr th {
   transition: opacity 0.3s ease; */
 }
 
-.modal-overlay.show {
+.add-edit-transaction-modal-overlay.show {
   opacity: 0.5;
 }
 
@@ -255,6 +270,10 @@ tr th {
   padding: 12px 16px;
   border-radius: 8px;
   border: 1px solid #fafafa;
+}
+
+.clicked {
+  color: #8193c0
 }
 
 .hidden {

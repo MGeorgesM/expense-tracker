@@ -1,11 +1,20 @@
+const modalOverlay = document.getElementById('modal-bg');
 const transactionsContainer = document.getElementById('transactions-container');
 const addTransactionBtn = document.getElementById('add-transaction-btn');
 const submitTransactionBtn = document.getElementById('submit-transaction-btn');
 const addTransactionModal = document.getElementById('add-transaction-modal');
-const addTransactionModalOverlay = document.getElementById('modal-bg');
 const cancelAddTransactionBtn = document.getElementById('cancel-add-transaction-btn');
-const descriptionInputOptions = document.getElementById('descriptionInput');
-const currencyInputOptions = document.getElementById('currencyInput');
+
+const hiddenId = document.getElementById('transactionId');
+const dateInput = document.getElementById('dateInput');
+const amountInput = document.getElementById('amountInput');
+const descriptionInput = document.getElementById('descriptionInput');
+const currencyInput = document.getElementById('currencyInput');
+const typeInputs = document.getElementsByName('transaction-type');
+
+const confirmationModal = document.getElementById('confirmation-modal');
+const confirmDeleteTransactionBtn = document.getElementById('delete-transaction-btn');
+const cancelDeletTransactionBtn = document.getElementById('cancel-delete-transaction-btn');
 
 const userGreeting = document.getElementById('user-greet');
 const userBalanceDisplay = document.getElementById('user-balance');
@@ -15,6 +24,9 @@ const expenseFilter = document.getElementById('expense-filter');
 const currencyFilter = document.getElementById('currency-filter');
 const amountToFilter = document.getElementById('amount-to-filter');
 const amountFromFilter = document.getElementById('amount-from-filter');
+
+let editTransactionBtns = [];
+let deleteTransactionBtns = [];
 
 let currentUser = null;
 let originalUserTransactions = [];
@@ -100,7 +112,7 @@ const user1 = {
 const currenciesApi = 'https://ivory-ostrich-yoke.cyclic.app/students/available';
 const convertApi = 'https://ivory-ostrich-yoke.cyclic.app/students/convert';
 
-const users = [user1, user2, user3];
+const users = [user1];
 
 const types = ['Income', 'Expense'];
 
@@ -131,6 +143,37 @@ const getUniqueId = (array) => {
     return latestId + 1;
 };
 
+const formatDateToEdit = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
+};
+
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
+};
+
+// const formatDateToEdit = (date) => {
+//     if (!(date instanceof Date)) {
+//         return 'Invalid Date';
+//     }
+//     const options = {
+//         year: 'numeric',
+//         month: 'short',
+//         day: 'numeric',
+//         hour: '2-digit',
+//         minute: '2-digit'
+//     };
+//     return date.toLocaleString('en-US', options);
+// };
+
 const calculateBalance = async () => {
     let balance = 0;
 
@@ -154,19 +197,31 @@ const calculateBalance = async () => {
 
 const populateDescriptionInput = () => {
     descriptions.forEach((description) => {
-        descriptionInputOptions.innerHTML += `<option value="${description}">${description}</option>`;
+        descriptionInput.innerHTML += `<option value="${description}">${description}</option>`;
     });
 };
 
 const populateTransaction = (transaction) => {
-    const dateOptions = {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-    };
-    const formattedDate = transaction.date.toLocaleDateString('en-US', dateOptions);
+    // const dateOptions = {
+    //     day: '2-digit',
+    //     month: '2-digit',
+    //     year: '2-digit',
+    //     hour: '2-digit',
+    //     minute: '2-digit',
+    // };
+
+    // let formattedDate = transaction.date;
+
+    // if (typeof transaction.date === 'string') {
+    //     const parsedDate = new Date(transaction.date);
+    //     if (!isNaN(parsedDate.getTime())) {
+    //         formattedDate = parsedDate.toLocaleDateString('en-US', dateOptions);
+    //     }
+    // } else if (transaction.date instanceof Date) {
+    //     formattedDate = transaction.date.toLocaleDateString('en-US', dateOptions);
+    // }
+
+    const formattedDate = formatDate(transaction.date);
 
     transactionsContainer.innerHTML += `<tr>
                                             <td>${transaction.id}</td>
@@ -175,49 +230,122 @@ const populateTransaction = (transaction) => {
                                             <td>${formattedDate}</td>
                                             <td>${transaction.amount}</td>
                                             <td>${transaction.currency}</td>
-                                            <td><i class="fa-regular fa-square-minus"></i></td>
+                                            <td class="table-actions flex center">
+                                            <i class="edit-transaction fa-regular fa-pen-to-square" data-id="${transaction.id}"></i>
+                                            <i class="delete-transaction fa-regular fa-square-minus" data-id="${transaction.id}"></i>
+                                            </td>
                                         </tr>`;
 };
 
 const populateTransactions = (transactions) => {
-    console.log(transactions);
+    console.log(hiddenId.value);
     transactionsContainer.innerHTML = '';
     transactions.forEach((transaction) => {
         populateTransaction(transaction);
     });
+
+    editTransactionBtns = document.querySelectorAll('.edit-transaction');
+    deleteTransactionBtns = document.querySelectorAll('.delete-transaction');
+
+    deleteTransactionBtns.forEach((element) => {
+        element.addEventListener('click', handleRemoveTransaction);
+    });
+
+    editTransactionBtns.forEach((element) => {
+        element.addEventListener('click', handleEditTransaction);
+    });
 };
 
-const addTransactionToUser = (user, transaction) => {
-    user.transactions.push(transaction);
+const handleEditTransaction = (event) => {
+    const transactionId = event.target.dataset.id;
+    const transaction = findTransactionById(transactionId);
+
+    hiddenId.value = transaction.id;
+    dateInput.value = formatDateToEdit(transaction.date);
+    amountInput.value = transaction.amount;
+    descriptionInput.value = transaction.description;
+    currencyInput.value = transaction.currency;
+
+    if (transaction.type === 'Income') {
+        incomeCheckbox.checked = true;
+    } else {
+        expenseCheckbox.checked = true;
+    }
+
+    showAddTransactionModal();
+};
+
+const handleRemoveTransaction = (event) => {
+    const transactionId = event.target.dataset.id;
+    showConfirmationModal();
+    confirmDeleteTransactionBtn.addEventListener('click', () => {
+        removeTransaction(transactionId);
+        closeConfirmationModal();
+    });
+    cancelDeletTransactionBtn.addEventListener('click', () => {
+        closeConfirmationModal();
+    });
+};
+
+const addTransactionToUser = (transaction) => {
+    currentUser.transactions.push(transaction);
+    saveCurrentUser();
+    populateTransactions(originalUserTransactions);
 };
 
 const createTransactionFromInput = () => {
+    const transactionId = document.getElementById('transactionId').value;
     const dateInput = new Date(document.getElementById('dateInput').value);
     const amountInput = parseFloat(document.getElementById('amountInput').value);
     const descriptionInput = document.getElementById('descriptionInput').value;
     const currencyInput = document.getElementById('currencyInput').value;
-    const typeInput = document.getElementById('typeInput').value;
+    const typeInputs = document.getElementsByName('transaction-type');
+
+    console.log(transactionId);
+
+    let selectedType = null;
+
+    for (const input of typeInputs) {
+        if (input.checked) {
+            selectedType = input.value;
+            break;
+        }
+    }
 
     return {
-        id: getUniqueId(),
+        id: parseInt(transactionId) || getUniqueId(originalUserTransactions),
         date: dateInput,
         amount: amountInput,
         currency: currencyInput,
         description: descriptionInput,
-        type: typeInput,
+        type: selectedType,
     };
 };
 
-const removeTransation = (user, transactionToRemove) => {
-    user.transaction = user.transactions.filter((transaction) => transaction !== transactionToRemove);
+const removeTransaction = (transactionId) => {
+    const idToRemove = parseInt(transactionId);
+    currentUser.transactions = currentUser.transactions.filter((transaction) => transaction.id !== idToRemove);
+    originalUserTransactions = currentUser.transactions;
+    saveCurrentUser();
+    populateTransactions(originalUserTransactions);
 };
 
-const editTransaction = (user, transactionId, updatedTransaction) => {
-    const transaction = user.transactions.find((transaction) => transaction.id === transactionId);
+const findTransactionById = (transactionId) => {
+    const idToFind = parseInt(transactionId);
+    return currentUser.transactions.find((transaction) => transaction.id === idToFind);
+};
+
+const editTransaction = (transactionId, updatedTransaction) => {
+    console.log('editing transaction');
+    const transaction = findTransactionById(transactionId);
     if (transaction) {
         for (let property in updatedTransaction) {
-            transaction[property] = updatedTransaction[property];
+            if (updatedTransaction.hasOwnProperty(property)) {
+                transaction[property] = updatedTransaction[property];
+            }
         }
+        saveCurrentUser();
+        populateTransactions(originalUserTransactions);
     } else {
         throw new Error('Transaction not Found');
     }
@@ -259,10 +387,14 @@ const filterByCurrency = (currency) => {
 };
 
 incomeFilter.addEventListener('click', () => {
+    incomeFilter.classList.toggle('clicked');
+    expenseFilter.classList.contains('clicked') && expenseFilter.classList.remove('clicked');
     filterByTransactionType('Income');
 });
 
 expenseFilter.addEventListener('click', () => {
+    expenseFilter.classList.toggle('clicked');
+    incomeFilter.classList.contains('clicked') && incomeFilter.classList.remove('clicked');
     filterByTransactionType('Expense');
 });
 
@@ -285,12 +417,22 @@ currencyFilter.addEventListener('change', () => {
 // Modal
 const showAddTransactionModal = () => {
     addTransactionModal.classList.remove('hidden');
-    addTransactionModalOverlay.classList.add('modal-overlay');
+    modalOverlay.classList.add('modal-overlay');
 };
 
 const closeAddTransactionModal = () => {
     addTransactionModal.classList.add('hidden');
-    addTransactionModalOverlay.classList.remove('modal-overlay');
+    modalOverlay.classList.remove('modal-overlay');
+};
+
+const showConfirmationModal = () => {
+    confirmationModal.classList.remove('hidden');
+    modalOverlay.classList.add('modal-overlay');
+};
+
+const closeConfirmationModal = () => {
+    confirmationModal.classList.add('hidden');
+    modalOverlay.classList.remove('modal-overlay');
 };
 
 // Fetching APIs
@@ -323,29 +465,34 @@ const populateCurrencies = async () => {
     }
 
     apiCurrenciesFound.forEach((currency) => {
-        currencyInputOptions.innerHTML += `<option value="${currency.code}">${currency.code}</option>`;
+        currencyInput.innerHTML += `<option value="${currency.code}">${currency.code}</option>`;
     });
 };
 
 // Add Transaction-Form Listener
 addTransactionBtn.addEventListener('click', () => {
+    console.log('adding transaction');
     showAddTransactionModal();
 });
 
 submitTransactionBtn.addEventListener('click', (event) => {
     event.preventDefault();
+    const transactionid = hiddenId.value;
+    console.log('event listener id found', transactionid);
 
     const transaction = createTransactionFromInput();
 
-    addTransactionToUser(currentUser, transaction);
+    transactionid ? editTransaction(transactionid, transaction) : addTransactionToUser(transaction);
 
     closeAddTransactionModal();
 });
 
 cancelAddTransactionBtn.addEventListener('click', () => closeAddTransactionModal());
 
+cancelDeletTransactionBtn.addEventListener('click', () => closeConfirmationModal());
+
 getCurrentUser();
-calculateBalance();
+// calculateBalance();
 populateDescriptionInput();
-populateCurrencies();
+// populateCurrencies();
 populateTransactions(originalUserTransactions);

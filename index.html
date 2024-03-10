@@ -17,7 +17,7 @@
     <header class="header">
         <section class="navbar flex space-between off-white-bg">
             <a href="#">
-                <img class="logo" alt="logo" src="/assets/logo.png"/>
+                <img class="logo" alt="logo" src="/assets/logo.png" />
             </a>
             <nav class="main-nav">
                 <ul class="nav-list flex center">
@@ -69,36 +69,47 @@
         </div>
     </section>
     <section id="modal-bg">
-        <div class="hidden modal center column primary-text primary-bg" id="add-transaction-modal">
+        <div class="hidden add-edit-transaction-modal center column primary-text primary-bg" id="add-transaction-modal">
             <h3>Add a Transaction</h3>
-            <div class="modal-content flex column center primary-bg">
+            <div class="add-edit-transaction-modal-content flex column center primary-bg">
+                <input type="hidden" id="transactionId">
                 <input type="date" id="dateInput">
                 <input type="number" id="amountInput" placeholder="Amount">
                 <div>
                     <select id="descriptionInput"></select>
                 </div>
                 <div>
-                    <select id="currencyInput"></select>
+                    <select id="currencyInput">
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                    </select>
                 </div>
                 <div id="typeInput" class="type-input">
                     <div class="flex center">
                         <div class="flex center">
-                            <input type="checkbox" id="incomeCheckbox" value="Income" checked>
+                            <input type="radio" name="transaction-type" id="incomeCheckbox" value="Income" checked>
                             <label for="incomeCheckbox">Income</label><br>
                         </div>
                         <div class="flex center">
-                            <input type="checkbox" id="expenseCheckbox" value="Expense">
+                            <input type="radio" name="transaction-type" id="expenseCheckbox" value="Expense">
                             <label for="expenseCheckbox">Expense</label><br>
                         </div>
                     </div>
                 </div>
-                <div class="modal-btns flex center">
+                <div class="add-edit-transaction-modal-btns flex center">
                     <button id="submit-transaction-btn" class="add-transaction-btn primary-bg">Add</button>
                     <button id="cancel-add-transaction-btn" class="add-transaction-btn primary-bg">Cancel</button>
                 </div>
             </div>
         </div>
     </section>
+    <div class="hidden confirmation-modal column center primary-text primary-bg" id="confirmation-modal">
+        <h3>Are you sure?</h3>
+        <div class="add-edit-transaction-modal-btns flex center">
+            <button id="delete-transaction-btn" class="add-transaction-btn primary-bg">Yes</button>
+            <button id="cancel-delete-transaction-btn" class="add-transaction-btn primary-bg">Cancel</button>
+        </div>
+    </div>
     <div class="add-btn primary-bg primary-text flex center" id="add-transaction-btn">
         <i class="fa-solid fa-plus"></i>
     </div>
