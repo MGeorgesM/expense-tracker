@@ -4,23 +4,23 @@
     box-sizing: border-box;
 }
 
-html,
-body {
+html {
     font-family: "Rubik", sans-serif;
 }
 
 .login-component {
     height: 100vh;
-    background-image: linear-gradient(rgba(41, 41, 41, 0.5),
+    /* background-image: linear-gradient(rgba(41, 41, 41, 0.5),
             rgba(0, 0, 0, 0.5)),
-        url(/assets/card-img.jpg);
-    background-size: cover;
+        url(/assets/loginregister.jpg);
+    background-size: cover; */
     gap: 24px;
 }
 
 .register {
     padding: 16px;
 }
+
 .register a:link,
 .register a:visited {
     color: #cf711f;
@@ -63,7 +63,10 @@ input {
     padding: 12px;
     border: 1px solid #e9ecef;
     border-radius: 4px;
-    ;
+}
+
+.validation {
+    color: #f03e3e;
 }
 
 .login-btn {

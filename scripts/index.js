@@ -1,3 +1,5 @@
+const logoutBtn = document.getElementById('logout-btn');
+
 const modalOverlay = document.getElementById('modal-bg');
 const transactionsContainer = document.getElementById('transactions-container');
 const addTransactionBtn = document.getElementById('add-transaction-btn');
@@ -66,7 +68,9 @@ const descriptions = [
 
 const user1 = {
     id: 1,
-    name: 'Jacob',
+    username: 'user',
+    password: 'user',
+    firstname: 'Georges',
     lastName: 'Mouawad',
     balance: null,
     transactions: [
@@ -129,6 +133,7 @@ const saveCurrentUser = () => {
 const logout = () => {
     localStorage.removeItem('currentUser');
     currentUser = null;
+    window.location.href = '/pages/sign-in.html';
 };
 
 const getUniqueId = (array) => {
@@ -380,36 +385,6 @@ const filterTransactions = () => {
     populateTransactions(filteredTransactions);
 };
 
-incomeFilter.addEventListener('click', () => {
-    incomeFilter.classList.toggle('clicked');
-    expenseFilter.classList.contains('clicked') && expenseFilter.classList.remove('clicked');
-    filters.type = incomeFilter.classList.contains('clicked') ? 'Income' : null;
-    filterTransactions();
-});
-
-expenseFilter.addEventListener('click', () => {
-    expenseFilter.classList.toggle('clicked');
-    incomeFilter.classList.contains('clicked') && incomeFilter.classList.remove('clicked');
-    filters.type = expenseFilter.classList.contains('clicked') ? 'Expense' : null;
-    filterTransactions();
-});
-
-amountToFilter.addEventListener('input', (event) => {
-    filters.amountTo = parseFloat(event.target.value) || null;
-    filterTransactions();
-});
-
-amountFromFilter.addEventListener('input', (event) => {
-    filters.amountFrom = parseFloat(event.target.value) || null;
-    filterTransactions();
-});
-
-currencyFilter.addEventListener('change', () => {
-    filters.currency = currencyFilter.value !== 'all' ? currencyFilter.value : null;
-    filterTransactions();
-
-});
-
 // Modal
 const showAddTransactionModal = () => {
     addTransactionModal.classList.remove('hidden');
@@ -465,30 +440,63 @@ const populateCurrencies = async () => {
     });
 };
 
-// Add Transaction-Form Listener
-addTransactionBtn.addEventListener('click', () => {
-    console.log('adding transaction');
-    showAddTransactionModal();
-});
+if (document.title === 'Dashboard') {
+    incomeFilter.addEventListener('click', () => {
+        incomeFilter.classList.toggle('clicked');
+        expenseFilter.classList.contains('clicked') && expenseFilter.classList.remove('clicked');
+        filters.type = incomeFilter.classList.contains('clicked') ? 'Income' : null;
+        filterTransactions();
+    });
 
-submitTransactionBtn.addEventListener('click', (event) => {
-    event.preventDefault();
-    const transactionid = hiddenId.value;
-    console.log('event listener id found', transactionid);
+    expenseFilter.addEventListener('click', () => {
+        expenseFilter.classList.toggle('clicked');
+        incomeFilter.classList.contains('clicked') && incomeFilter.classList.remove('clicked');
+        filters.type = expenseFilter.classList.contains('clicked') ? 'Expense' : null;
+        filterTransactions();
+    });
 
-    const transaction = createTransactionFromInput();
+    amountToFilter.addEventListener('input', (event) => {
+        filters.amountTo = parseFloat(event.target.value) || null;
+        filterTransactions();
+    });
 
-    transactionid ? editTransaction(transactionid, transaction) : addTransactionToUser(transaction);
+    amountFromFilter.addEventListener('input', (event) => {
+        filters.amountFrom = parseFloat(event.target.value) || null;
+        filterTransactions();
+    });
 
-    closeAddTransactionModal();
-});
+    currencyFilter.addEventListener('change', () => {
+        filters.currency = currencyFilter.value !== 'all' ? currencyFilter.value : null;
+        filterTransactions();
+    });
 
-cancelAddTransactionBtn.addEventListener('click', () => closeAddTransactionModal());
+    // Add Transaction-Form Listener
+    addTransactionBtn.addEventListener('click', () => {
+        console.log('adding transaction');
+        showAddTransactionModal();
+    });
 
-cancelDeletTransactionBtn.addEventListener('click', () => closeConfirmationModal());
+    submitTransactionBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        const transactionid = hiddenId.value;
+        console.log('event listener id found', transactionid);
 
-getCurrentUser();
-// calculateBalance();
-populateDescriptionInput();
-// populateCurrencies();
-populateTransactions(originalUserTransactions);
+        const transaction = createTransactionFromInput();
+
+        transactionid ? editTransaction(transactionid, transaction) : addTransactionToUser(transaction);
+
+        closeAddTransactionModal();
+    });
+
+    cancelAddTransactionBtn.addEventListener('click', () => closeAddTransactionModal());
+
+    cancelDeletTransactionBtn.addEventListener('click', () => closeConfirmationModal());
+
+    logoutBtn.addEventListener('click', logout);
+
+    getCurrentUser();
+    // calculateBalance();
+    populateDescriptionInput();
+    // populateCurrencies();
+    populateTransactions(originalUserTransactions);
+}
