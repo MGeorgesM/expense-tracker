@@ -23,17 +23,18 @@ if (document.title === 'Sign Up') {
 }
 
 const register = (usernameInput, firstNameInput, lastNameInput, passwordInput) => {
-    const storedUsers = JSON.parse(localStorage.getItem('users')) || users;
-    console.log(users);
+    const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
 
     try {
-        for (let i = 0; i < storedUsers.length; i++) {
-            if (storedUsers[i].username === usernameInput) {
-                throw Error('Username is already taken');
+        if (storedUsers.length > 0) {
+            for (let i = 0; i < storedUsers.length; i++) {
+                if (storedUsers[i].username === usernameInput) {
+                    throw Error('Username is already taken');
+                }
             }
         }
         const newUser = {
-            id: getUniqueId(users),
+            id: getUniqueId(storedUsers),
             username: usernameInput,
             password: passwordInput,
             firstname: firstNameInput,
@@ -51,9 +52,12 @@ const register = (usernameInput, firstNameInput, lastNameInput, passwordInput) =
 };
 
 const login = (usernameInput, passwordInput) => {
-    const storedUsers = JSON.parse(localStorage.getItem('users')) || users;
+    const storedUsers = JSON.parse(localStorage.getItem('users'));
 
     try {
+        if (!storedUsers) {
+            throw Error('No Users In Database');
+        }
         for (let i = 0; i < storedUsers.length; i++) {
             if (storedUsers[i].username === usernameInput && storedUsers[i].password === passwordInput) {
                 localStorage.setItem('currentUser', JSON.stringify(storedUsers[i]));

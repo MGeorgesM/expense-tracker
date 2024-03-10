@@ -104,24 +104,26 @@ const user1 = {
 const currenciesApi = 'https://rich-erin-angler-hem.cyclic.app/students/available';
 const convertApi = 'https://ivory-ostrich-yoke.cyclic.app/students/convert';
 
-const users = [user1];
-
 const getCurrentUser = () => {
-    currentUser = JSON.parse(localStorage.getItem('currentUser')) || user1;
+    currentUser = JSON.parse(localStorage.getItem('currentUser'));
     originalUserTransactions = currentUser.transactions;
     userGreeting.innerHTML = currentUser.firstname;
-    console.log(currentUser)
-    console.log(users)
 };
 
 const saveCurrentUser = () => {
-    const index = users.findIndex((user) => user.id === currentUser.id);
-    index !== -1 && (users[index] = currentUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
+    const index = storedUsers.findIndex((user) => user.id === currentUser.id);
+    if (index !== -1) {
+        storedUsers[index] = currentUser;
+        localStorage.setItem('currentUser', JSON.stringify(storedUsers[index]));
+    } else {
+        storedUsers.push(currentUser)
+    }
+    localStorage.setItem('users', JSON.stringify(storedUsers));
 };
 
 const logout = () => {
+    saveCurrentUser();
     localStorage.removeItem('currentUser');
     currentUser = null;
     window.location.href = '/pages/sign-in.html';
@@ -163,6 +165,8 @@ const calculateBalance = async () => {
     }
 
     userBalanceDisplay.innerHTML = `${balance.toFixed(2)}`;
+    currentUser.balance = balance;
+    saveCurrentUser()
 };
 
 const populateDescriptionInput = () => {
@@ -431,7 +435,7 @@ if (document.title === 'Dashboard') {
         filters.currency = currencyFilter.value !== 'All' ? currencyFilter.value : null;
         filterTransactions();
 
-        currencyFilter.value = filters.currency || 'All'
+        currencyFilter.value = filters.currency || 'All';
     });
 
     // Add Transaction-Form Listener
@@ -461,6 +465,7 @@ if (document.title === 'Dashboard') {
     logoutBtn.addEventListener('click', logout);
 
     getCurrentUser();
+    saveCurrentUser();
     populateCurrencies();
     calculateBalance();
     populateDescriptionInput();

@@ -252,6 +252,10 @@ tr th {
   font-weight: 400;
 }
 
+.user-greet {
+  text-transform: capitalize;
+}
+
 .income {
   color: #343a40;
 }
