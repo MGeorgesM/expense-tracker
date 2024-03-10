@@ -110,6 +110,8 @@ const getCurrentUser = () => {
     currentUser = JSON.parse(localStorage.getItem('currentUser')) || user1;
     originalUserTransactions = currentUser.transactions;
     userGreeting.innerHTML = currentUser.firstname;
+    console.log(currentUser)
+    console.log(users)
 };
 
 const saveCurrentUser = () => {
@@ -261,8 +263,6 @@ const createTransactionFromInput = () => {
     const currencyInput = document.getElementById('currencyInput').value;
     const typeInputs = document.getElementsByName('transaction-type');
 
-    console.log(transactionId);
-
     let selectedType = null;
 
     for (const input of typeInputs) {
@@ -297,7 +297,6 @@ const findTransactionById = (transactionId) => {
 };
 
 const editTransaction = async (transactionId, updatedTransaction) => {
-    console.log('editing transaction');
     const transaction = findTransactionById(transactionId);
     if (transaction) {
         for (let property in updatedTransaction) {
@@ -336,14 +335,13 @@ const filterTransactions = () => {
     populateTransactions(filteredTransactions);
 };
 
-// Modal
+// Modals
 const showAddTransactionModal = () => {
     addTransactionModal.classList.remove('hidden');
     modalOverlay.classList.add('modal-overlay');
 };
 
 const closeAddTransactionModal = () => {
-    hiddenId.value = null;
     addTransactionModal.classList.add('hidden');
     modalOverlay.classList.remove('modal-overlay');
 };
@@ -356,6 +354,15 @@ const showConfirmationModal = () => {
 const closeConfirmationModal = () => {
     confirmationModal.classList.add('hidden');
     modalOverlay.classList.remove('modal-overlay');
+};
+
+const resetModalInputsValues = () => {
+    transactionId.value = null;
+    dateInput.value = '';
+    amountInput.value = '';
+    descriptionInput.value = 'Salary';
+    currencyInput.value = 'USD';
+    document.getElementById('incomeCheckbox').checked = true;
 };
 
 // Fetching APIs
@@ -391,6 +398,8 @@ const populateCurrencies = async () => {
     apiCurrenciesFound.forEach((currency) => {
         currencyInput.innerHTML += `<option value="${currency.code}">${currency.code}</option>`;
     });
+
+    currencyFilter.value = filters.currency || 'All';
 };
 
 if (document.title === 'Dashboard') {
@@ -421,6 +430,8 @@ if (document.title === 'Dashboard') {
     currencyFilter.addEventListener('change', () => {
         filters.currency = currencyFilter.value !== 'All' ? currencyFilter.value : null;
         filterTransactions();
+
+        currencyFilter.value = filters.currency || 'All'
     });
 
     // Add Transaction-Form Listener
@@ -431,22 +442,26 @@ if (document.title === 'Dashboard') {
     submitTransactionBtn.addEventListener('click', (event) => {
         event.preventDefault();
         const transactionid = hiddenId.value;
-        console.log('event listener id found', transactionid);
 
         const transaction = createTransactionFromInput();
 
         transactionid ? editTransaction(transactionid, transaction) : addTransactionToUser(transaction);
 
         closeAddTransactionModal();
+        resetModalInputsValues();
     });
 
-    cancelAddTransactionBtn.addEventListener('click', () => closeAddTransactionModal());
+    cancelAddTransactionBtn.addEventListener('click', () => {
+        closeAddTransactionModal();
+        resetModalInputsValues();
+    });
 
     cancelDeletTransactionBtn.addEventListener('click', () => closeConfirmationModal());
 
     logoutBtn.addEventListener('click', logout);
 
     getCurrentUser();
+    populateCurrencies();
     calculateBalance();
     populateDescriptionInput();
     populateTransactions(originalUserTransactions);

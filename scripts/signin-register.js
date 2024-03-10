@@ -43,7 +43,7 @@ const register = (usernameInput, firstNameInput, lastNameInput, passwordInput) =
         };
         storedUsers.push(newUser);
         localStorage.setItem('users', JSON.stringify(storedUsers));
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        localStorage.setItem('currentUser', JSON.stringify(newUser));
         window.location.href = '/index.html';
     } catch (error) {
         validationDisplay.innerHTML = error.message;
@@ -56,7 +56,7 @@ const login = (usernameInput, passwordInput) => {
     try {
         for (let i = 0; i < storedUsers.length; i++) {
             if (storedUsers[i].username === usernameInput && storedUsers[i].password === passwordInput) {
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                localStorage.setItem('currentUser', JSON.stringify(storedUsers[i]));
                 window.location.href = '/index.html';
                 return;
             }

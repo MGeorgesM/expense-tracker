@@ -80,4 +80,8 @@
         flex-direction: column;
     }
 
+    .footer-main {
+        flex-direction: column;
+    }
+
 }
