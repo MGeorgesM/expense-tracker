@@ -52,7 +52,7 @@ const register = (usernameInput, firstNameInput, lastNameInput, passwordInput) =
 };
 
 const login = (usernameInput, passwordInput) => {
-    const storedUsers = JSON.parse(localStorage.getItem('users'));
+    const storedUsers = JSON.parse(localStorage.getItem('users')) || [user1];
 
     try {
         if (!storedUsers) {

@@ -86,7 +86,7 @@ const user1 = {
             id: 3,
             date: new Date(2024, 4, 10),
             amount: 2000.0,
-            currency: 'EUR',
+            currency: 'AED',
             description: 'Dining Out',
             type: 'Income',
         },
@@ -102,10 +102,10 @@ const user1 = {
 };
 
 const currenciesApi = 'https://rich-erin-angler-hem.cyclic.app/students/available';
-const convertApi = 'https://ivory-ostrich-yoke.cyclic.app/students/convert';
+const convertApi = 'https://rich-erin-angler-hem.cyclic.app/students/convert';
 
 const getCurrentUser = () => {
-    currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    currentUser = JSON.parse(localStorage.getItem('currentUser')) || user1;
     originalUserTransactions = currentUser.transactions;
     userGreeting.innerHTML = currentUser.firstname;
 };

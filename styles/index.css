@@ -22,6 +22,7 @@
 
 .nav-btn:link,
 .nav-btn:visited {
+  color: #343a40;
   border: 1px solid #343a40;
   background-color: none;
   padding: 12px 52px;
