@@ -133,32 +133,6 @@ const getUniqueId = (array) => {
     return latestId + 1;
 };
 
-const formatDateToEdit = (date) => {
-    const dateOptions = {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-    };
-
-    let formattedDate = date;
-
-    if (typeof date === 'string') {
-        const parsedDate = new Date(date);
-        if (!isNaN(parsedDate.getTime())) {
-            formattedDate = parsedDate.toLocaleDateString('en-US', dateOptions);
-        }
-    } else if (date instanceof Date) {
-        formattedDate = date.toLocaleDateString('en-US', dateOptions);
-    }
-    // const year = date.getFullYear();
-    // const month = String(date.getMonth() + 1).padStart(2, '0');
-    // const day = String(date.getDate()).padStart(2, '0');
-    // const formattedDate = `${year}-${month}-${day}`;
-    return formattedDate;
-};
-
 const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -246,7 +220,7 @@ const handleEditTransaction = (event) => {
     const transaction = findTransactionById(transactionId);
 
     hiddenId.value = transaction.id;
-    dateInput.value = formatDateToEdit(transaction.date);
+    dateInput.value = formatDate(transaction.date);
     amountInput.value = transaction.amount;
     descriptionInput.value = transaction.description;
     currencyInput.value = transaction.currency;
