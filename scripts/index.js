@@ -2,10 +2,12 @@ const logoutBtn = document.getElementById('logout-btn');
 
 const modalOverlay = document.getElementById('modal-bg');
 const transactionsContainer = document.getElementById('transactions-container');
+const transactionsTable = document.getElementById('transactions-table');
 const addTransactionBtn = document.getElementById('add-transaction-btn');
 const submitTransactionBtn = document.getElementById('submit-transaction-btn');
 const addTransactionModal = document.getElementById('add-transaction-modal');
 const cancelAddTransactionBtn = document.getElementById('cancel-add-transaction-btn');
+const notFoundPrompt = document.getElementById('not-found');
 
 const hiddenId = document.getElementById('transactionId');
 const dateInput = document.getElementById('dateInput');
@@ -34,15 +36,13 @@ let currentUser = null;
 let originalUserTransactions = [];
 let filteredTransactions = [];
 let apiCurrenciesFound = [];
-
-// const defaultTransaction = {
-//     id: getUniqueId(),
-//     date: new Date(),
-//     amount: null,
-//     currency: 'USD',
-//     description: null,
-//     type: null,
-// };
+let currentTypeFilterApplied = null;
+let filters = {
+    type: null,
+    amountFrom: null,
+    amountTo: null,
+    currency: null,
+};
 
 const descriptions = [
     'Groceries',
@@ -57,14 +57,6 @@ const descriptions = [
     'Salary',
     'Other',
 ];
-
-// const defaultUser = {
-//     id: getUniqueId(users),
-//     name: null,
-//     lastName: null,
-//     balance: null,
-//     transactions: [],
-// };
 
 const user1 = {
     id: 1,
@@ -114,13 +106,10 @@ const convertApi = 'https://ivory-ostrich-yoke.cyclic.app/students/convert';
 
 const users = [user1];
 
-const types = ['Income', 'Expense'];
-
 const getCurrentUser = () => {
     currentUser = JSON.parse(localStorage.getItem('currentUser')) || user1;
     originalUserTransactions = currentUser.transactions;
-    console.log('Currently in home', currentUser);
-    console.log('Original Transactions', originalUserTransactions);
+    userGreeting.innerHTML = currentUser.firstname;
 };
 
 const saveCurrentUser = () => {
@@ -145,10 +134,28 @@ const getUniqueId = (array) => {
 };
 
 const formatDateToEdit = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
+    const dateOptions = {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+    };
+
+    let formattedDate = date;
+
+    if (typeof date === 'string') {
+        const parsedDate = new Date(date);
+        if (!isNaN(parsedDate.getTime())) {
+            formattedDate = parsedDate.toLocaleDateString('en-US', dateOptions);
+        }
+    } else if (date instanceof Date) {
+        formattedDate = date.toLocaleDateString('en-US', dateOptions);
+    }
+    // const year = date.getFullYear();
+    // const month = String(date.getMonth() + 1).padStart(2, '0');
+    // const day = String(date.getDate()).padStart(2, '0');
+    // const formattedDate = `${year}-${month}-${day}`;
     return formattedDate;
 };
 
@@ -160,20 +167,6 @@ const formatDate = (dateString) => {
     const formattedDate = `${year}-${month}-${day}`;
     return formattedDate;
 };
-
-// const formatDateToEdit = (date) => {
-//     if (!(date instanceof Date)) {
-//         return 'Invalid Date';
-//     }
-//     const options = {
-//         year: 'numeric',
-//         month: 'short',
-//         day: 'numeric',
-//         hour: '2-digit',
-//         minute: '2-digit'
-//     };
-//     return date.toLocaleString('en-US', options);
-// };
 
 const calculateBalance = async () => {
     let balance = 0;
@@ -203,28 +196,9 @@ const populateDescriptionInput = () => {
 };
 
 const populateTransaction = (transaction) => {
-    // const dateOptions = {
-    //     day: '2-digit',
-    //     month: '2-digit',
-    //     year: '2-digit',
-    //     hour: '2-digit',
-    //     minute: '2-digit',
-    // };
-
-    // let formattedDate = transaction.date;
-
-    // if (typeof transaction.date === 'string') {
-    //     const parsedDate = new Date(transaction.date);
-    //     if (!isNaN(parsedDate.getTime())) {
-    //         formattedDate = parsedDate.toLocaleDateString('en-US', dateOptions);
-    //     }
-    // } else if (transaction.date instanceof Date) {
-    //     formattedDate = transaction.date.toLocaleDateString('en-US', dateOptions);
-    // }
-
     const formattedDate = formatDate(transaction.date);
     let transactionFormat = '';
-    transaction.type === 'Income' ? transactionFormat = 'income' : ''
+    transaction.type === 'Income' ? (transactionFormat = 'income') : (transactionFormat = 'expense');
 
     transactionsContainer.innerHTML += `<tr class="${transactionFormat}">
                                             <td>${transaction.id}</td>
@@ -241,8 +215,14 @@ const populateTransaction = (transaction) => {
 };
 
 const populateTransactions = (transactions) => {
-    console.log(hiddenId.value);
     transactionsContainer.innerHTML = '';
+    if (transactions.length === 0) {
+        transactionsTable.classList.add('hidden');
+        notFoundPrompt.classList.remove('hidden');
+        return;
+    }
+    transactionsTable.classList.remove('hidden');
+    notFoundPrompt.classList.add('hidden');
     transactions.forEach((transaction) => {
         populateTransaction(transaction);
     });
@@ -257,6 +237,8 @@ const populateTransactions = (transactions) => {
     editTransactionBtns.forEach((element) => {
         element.addEventListener('click', handleEditTransaction);
     });
+
+    populateCurrencies();
 };
 
 const handleEditTransaction = (event) => {
@@ -340,7 +322,7 @@ const findTransactionById = (transactionId) => {
     return currentUser.transactions.find((transaction) => transaction.id === idToFind);
 };
 
-const editTransaction = (transactionId, updatedTransaction) => {
+const editTransaction = async (transactionId, updatedTransaction) => {
     console.log('editing transaction');
     const transaction = findTransactionById(transactionId);
     if (transaction) {
@@ -351,22 +333,13 @@ const editTransaction = (transactionId, updatedTransaction) => {
         }
         saveCurrentUser();
         populateTransactions(originalUserTransactions);
+        await calculateBalance();
     } else {
         throw new Error('Transaction not Found');
     }
 };
 
 // Filters
-
-let currentTypeFilterApplied = null;
-
-let filters = {
-    type: null,
-    amountFrom: null,
-    amountTo: null,
-    currency: null,
-};
-
 const filterTransactions = () => {
     let filteredTransactions = [...originalUserTransactions];
 
@@ -396,6 +369,7 @@ const showAddTransactionModal = () => {
 };
 
 const closeAddTransactionModal = () => {
+    hiddenId.value = null;
     addTransactionModal.classList.add('hidden');
     modalOverlay.classList.remove('modal-overlay');
 };
@@ -428,8 +402,9 @@ const convertAmount = async (from, to, amount) => {
 
 const populateCurrencies = async () => {
     const userUniqueCurrencies = {};
-
-    await getApiCurrencies();
+    (currencyInput.innerHTML = ''),
+        (currencyFilter.innerHTML = `<option value="All">All</option>`),
+        await getApiCurrencies();
 
     currentUser.transactions.forEach((transaction) => {
         userUniqueCurrencies[transaction.currency] = true;
@@ -496,10 +471,9 @@ if (document.title === 'Dashboard') {
     cancelDeletTransactionBtn.addEventListener('click', () => closeConfirmationModal());
 
     logoutBtn.addEventListener('click', logout);
-    
+
     getCurrentUser();
     calculateBalance();
     populateDescriptionInput();
-    populateCurrencies();
     populateTransactions(originalUserTransactions);
 }
