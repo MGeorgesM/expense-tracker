@@ -32,10 +32,6 @@ let currentUser = null;
 let originalUserTransactions = [];
 let filteredTransactions = [];
 let apiCurrenciesFound = [];
-let currentTypeFilterApplied = null;
-let currentAmountFromFilterApplied = null;
-let currentAmountToFilterApplied = null;
-let currentCurrencyFilterApplied = null;
 
 // const defaultTransaction = {
 //     id: getUniqueId(),
@@ -109,7 +105,7 @@ const user1 = {
     ],
 };
 
-const currenciesApi = 'https://ivory-ostrich-yoke.cyclic.app/students/available';
+const currenciesApi = 'https://crowded-cyan-wildebeest.cyclic.app/students/available';
 const convertApi = 'https://ivory-ostrich-yoke.cyclic.app/students/convert';
 
 const users = [user1];
@@ -353,65 +349,65 @@ const editTransaction = (transactionId, updatedTransaction) => {
 
 // Filters
 
-const filterByTransactionType = (type) => {
-    currentTypeFilterApplied = currentTypeFilterApplied === type ? null : type;
+let currentTypeFilterApplied = null;
 
-    filteredTransactions = currentTypeFilterApplied
-        ? originalUserTransactions.filter((transaction) => transaction.type === currentTypeFilterApplied)
-        : originalUserTransactions;
-
-    populateTransactions(filteredTransactions);
+let filters = {
+    type: null,
+    amountFrom: null,
+    amountTo: null,
+    currency: null,
 };
 
-const filterByAmountTo = (amountTo) => {
-    const amountFrom = parseFloat(amountFromFilter.value);
-    filteredTransactions = originalUserTransactions.filter((transaction) => {
-        if (isNaN(amountTo)) return !amountFrom || transaction.amount >= amountFrom;
-        return (!amountFrom || transaction.amount >= amountFrom) && transaction.amount <= amountTo;
-    });
-    populateTransactions(filteredTransactions);
-};
+const filterTransactions = () => {
+    let filteredTransactions = [...originalUserTransactions];
 
-const filterByAmountFrom = (amountFrom) => {
-    const amountTo = parseFloat(amountToFilter.value);
-    filteredTransactions = originalUserTransactions.filter((transaction) => {
-        if (isNaN(amountFrom)) return !amountTo || transaction.amount <= amountTo;
-        return (!amountTo || transaction.amount <= amountTo) && transaction.amount >= amountFrom;
-    });
-    populateTransactions(filteredTransactions);
-};
+    if (filters.type) {
+        filteredTransactions = filteredTransactions.filter((transaction) => transaction.type === filters.type);
+    }
 
-const filterByCurrency = (currency) => {
-    filteredTransactions = originalUserTransactions.filter((transaction) => transaction.currency === currency);
-    populateTransactions(filteredTransactions.length > 0 ? filteredTransactions : originalUserTransactions);
+    if (filters.amountFrom !== null) {
+        filteredTransactions = filteredTransactions.filter((transaction) => transaction.amount >= filters.amountFrom);
+    }
+
+    if (filters.amountTo !== null) {
+        filteredTransactions = filteredTransactions.filter((transaction) => transaction.amount <= filters.amountTo);
+    }
+
+    if (filters.currency) {
+        filteredTransactions = filteredTransactions.filter((transaction) => transaction.currency === filters.currency);
+    }
+
+    populateTransactions(filteredTransactions);
 };
 
 incomeFilter.addEventListener('click', () => {
     incomeFilter.classList.toggle('clicked');
     expenseFilter.classList.contains('clicked') && expenseFilter.classList.remove('clicked');
-    filterByTransactionType('Income');
+    filters.type = incomeFilter.classList.contains('clicked') ? 'Income' : null;
+    filterTransactions();
 });
 
 expenseFilter.addEventListener('click', () => {
     expenseFilter.classList.toggle('clicked');
     incomeFilter.classList.contains('clicked') && incomeFilter.classList.remove('clicked');
-    filterByTransactionType('Expense');
+    filters.type = expenseFilter.classList.contains('clicked') ? 'Expense' : null;
+    filterTransactions();
 });
 
 amountToFilter.addEventListener('input', (event) => {
-    const amountTo = parseFloat(event.target.value);
-    console.log(amountTo);
-    filterByAmountTo(amountTo);
+    filters.amountTo = parseFloat(event.target.value) || null;
+    filterTransactions();
 });
 
 amountFromFilter.addEventListener('input', (event) => {
-    const amountFrom = parseFloat(event.target.value);
-    filterByAmountFrom(amountFrom ? amountFrom : 0);
+    filters.amountFrom = parseFloat(event.target.value) || null;
+    filterTransactions();
 });
 
 currencyFilter.addEventListener('change', () => {
-    const selectedCurrency = currencyFilter.value;
-    filterByCurrency(selectedCurrency);
+    filters.currency = currencyFilter.value !== 'all' ? currencyFilter.value : null;
+    filterTransactions();
+
 });
 
 // Modal
