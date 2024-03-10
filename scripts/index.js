@@ -109,7 +109,7 @@ const user1 = {
     ],
 };
 
-const currenciesApi = 'https://crowded-cyan-wildebeest.cyclic.app/students/available';
+const currenciesApi = 'https://rich-erin-angler-hem.cyclic.app/students/available';
 const convertApi = 'https://ivory-ostrich-yoke.cyclic.app/students/convert';
 
 const users = [user1];
@@ -290,10 +290,11 @@ const handleRemoveTransaction = (event) => {
     });
 };
 
-const addTransactionToUser = (transaction) => {
+const addTransactionToUser = async (transaction) => {
     currentUser.transactions.push(transaction);
     saveCurrentUser();
     populateTransactions(originalUserTransactions);
+    await calculateBalance();
 };
 
 const createTransactionFromInput = () => {
@@ -325,12 +326,13 @@ const createTransactionFromInput = () => {
     };
 };
 
-const removeTransaction = (transactionId) => {
+const removeTransaction = async (transactionId) => {
     const idToRemove = parseInt(transactionId);
     currentUser.transactions = currentUser.transactions.filter((transaction) => transaction.id !== idToRemove);
     originalUserTransactions = currentUser.transactions;
     saveCurrentUser();
     populateTransactions(originalUserTransactions);
+    await calculateBalance();
 };
 
 const findTransactionById = (transactionId) => {
@@ -468,13 +470,12 @@ if (document.title === 'Dashboard') {
     });
 
     currencyFilter.addEventListener('change', () => {
-        filters.currency = currencyFilter.value !== 'all' ? currencyFilter.value : null;
+        filters.currency = currencyFilter.value !== 'All' ? currencyFilter.value : null;
         filterTransactions();
     });
 
     // Add Transaction-Form Listener
     addTransactionBtn.addEventListener('click', () => {
-        console.log('adding transaction');
         showAddTransactionModal();
     });
 
@@ -495,7 +496,7 @@ if (document.title === 'Dashboard') {
     cancelDeletTransactionBtn.addEventListener('click', () => closeConfirmationModal());
 
     logoutBtn.addEventListener('click', logout);
-
+    
     getCurrentUser();
     calculateBalance();
     populateDescriptionInput();
