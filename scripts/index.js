@@ -5,6 +5,8 @@ const submitTransactionBtn = document.getElementById('submit-transaction-btn');
 const addTransactionModal = document.getElementById('add-transaction-modal');
 const addTransactionModalOverlay = document.getElementById('modal-bg');
 const cancelAddTransactionBtn = document.getElementById('cancel-add-transaction-btn');
+const descriptionInputOptions = document.getElementById('descriptionInput');
+const currencyInputOptions = document.getElementById('currencyInput');
 
 const incomeFilter = document.getElementById('income-filter');
 const expenseFilter = document.getElementById('expense-filter');
@@ -13,8 +15,9 @@ const amountToFilter = document.getElementById('amount-to-filter');
 const amountFromFilter = document.getElementById('amount-from-filter');
 
 let currentUser = null;
-let currentUserTransactions = [];
-let fitleredTransactions = [];
+let originalUserTransactions = [];
+let filteredTransactions = [];
+let apiCurrenciesFound = [];
 let incomeFilterApplied = false;
 let expenseFilterApplied = false;
 
@@ -40,8 +43,6 @@ const descriptions = [
     'Salary',
     'Other',
 ];
-
-
 
 // const defaultUser = {
 //     id: getUniqueId(users),
@@ -77,7 +78,7 @@ const user1 = {
             id: 3,
             date: new Date(2024, 4, 10),
             amount: 120.0,
-            currency: 'USD',
+            currency: 'EUR',
             description: 'Dining Out',
             type: 'Expense',
         },
@@ -85,22 +86,25 @@ const user1 = {
             id: 4,
             date: new Date(2024, 5, 5),
             amount: 1000.0,
-            currency: 'USD',
+            currency: 'AED',
             description: 'Salary',
             type: 'Income',
         },
     ],
 };
 
+const currenciesApi = 'https://ivory-ostrich-yoke.cyclic.app/students/available';
+const convertApi = 'https://ivory-ostrich-yoke.cyclic.app/students/convert';
+
 const users = [user1];
 
 const types = ['Income', 'Expense'];
 
-const loadCurrentUser = () => {
-    if ((currentUser = JSON.parse(localStorage.getItem('currentUser')))) {
-        currentUserTransactions = currentUser.transactions;
-        console.log('current in home', currentUser);
-    }
+const getCurrentUser = () => {
+    currentUser = JSON.parse(localStorage.getItem('currentUser')) || user1;
+    originalUserTransactions = currentUser.transactions;
+    console.log('Currently in home', currentUser);
+    console.log(originalUserTransactions);
 };
 
 const logout = () => {
@@ -126,8 +130,31 @@ const calculateBalance = (transactions) => {
     return balance;
 };
 
+const populateDescriptionInput = () => {
+    descriptions.forEach((description) => {
+        descriptionInputOptions.innerHTML += `<option value="${description}">${description}</option>`;
+    });
+};
+
 const populateTransaction = (transaction) => {
-    transactionsContainer.innerHTML += ``;
+    const dateOptions = {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+    };
+    const formattedDate = transaction.date.toLocaleDateString('en-US', dateOptions);
+
+    transactionsContainer.innerHTML += `<tr>
+                                            <td>${transaction.id}</td>
+                                            <td>${transaction.type}</td>
+                                            <td>${transaction.description}</td>
+                                            <td>${formattedDate}</td>
+                                            <td>${transaction.amount}</td>
+                                            <td>${transaction.currency}</td>
+                                            <td><i class="fa-regular fa-square-minus"></i></td>
+                                        </tr>`;
 };
 
 const populateTransactions = (transactions) => {
@@ -175,39 +202,101 @@ const editTransaction = (user, transactionId, updatedTransaction) => {
 
 // Filters
 
-const filterByTransactionType = (type, transactions) => {
-    const filterResult = transactions.filter((transaction) => transaction.type === type) || currentUserTransactions;
-    populateTransactions(filterResult.length > 0 ? filterResult : currentUserTransactions);
+const filterByTransactionType = (type) => {
+    filteredTransactions = originalUserTransactions.filter((transaction) => transaction.type === type);
+    populateTransactions(filteredTransactions);
 };
 
-const filterByAmountTo = (amountTo, transactions) => {
-    const filterResult =
-        transactions.filter((transaction) => transaction.amount <= amountTo) || currentUserTransactions;
-    populateTransactions(filterResult.length > 0 ? filterResult : currentUserTransactions);
+const filterByAmountTo = (amountTo) => {
+    const amountFrom = parseFloat(amountFromFilter.value);
+
+    if (amountFrom) {
+        filteredTransactions = originalUserTransactions.filter(
+            (transaction) => transaction.amount >= amountFrom && transaction.amount <= amountTo
+        );
+    } else {
+        filteredTransactions = originalUserTransactions.filter((transaction) => transaction.amount <= amountTo);
+    }
+
+    populateTransactions(filteredTransactions);
 };
 
-const filterByAmountFrom = (amountFrom, transactions) => {
-    const filterResult =
-        transactions.filter((transaction) => transaction.amount > amountFrom) || currentUserTransactions;
-    populateTransactions(filterResult.length > 0 ? filterResult : currentUserTransactions);
+const filterByAmountFrom = (amountFrom) => {
+    const amountTo = parseFloat(amountToFilter.value);
+
+    if (amountTo) {
+        filteredTransactions = originalUserTransactions.filter(
+            (transaction) => transaction.amount >= amountFrom && transaction.amount <= amountTo
+        );
+    } else {
+        filteredTransactions = originalUserTransactions.filter((transaction) => transaction.amount >= amountFrom);
+        console.log(filteredTransactions)
+    }
+
+    populateTransactions(filteredTransactions);
 };
 
-const filterByCurrency = (currency, transactions) => {
-    const filterResult =
-        transactions.filter((transaction) => transaction.currency === currency) || currentUserTransactions;
-    populateTransactions(filterResult.length > 0 ? filterResult : currentUserTransactions);
+const filterByCurrency = (currency) => {
+    filteredTransactions = originalUserTransactions.filter((transaction) => transaction.currency === currency);
+    populateTransactions(filteredTransactions.length > 0 ? filteredTransactions : originalUserTransactions);
 };
+
+incomeFilter.addEventListener('click', () => {
+    filterByTransactionType('Income');
+});
+
+expenseFilter.addEventListener('click', () => {
+    filterByTransactionType('Expense');
+});
+
+amountToFilter.addEventListener('input', (event) => {
+    const amountTo = parseFloat(event.target.value);
+    filterByAmountTo(amountTo);
+});
+
+amountFromFilter.addEventListener('input', (event) => {
+    const amountFrom = parseFloat(event.target.value);
+    filterByAmountFrom(amountFrom);
+});
+
+currencyFilter.addEventListener('change', () => {
+    const selectedCurrency = currencyFilter.value;
+    filterByCurrency(selectedCurrency);
+});
 
 // Modal
 const showAddTransactionModal = () => {
     addTransactionModal.classList.remove('hidden');
     addTransactionModalOverlay.classList.add('modal-overlay');
-    
 };
 
 const closeAddTransactionModal = () => {
     addTransactionModal.classList.add('hidden');
-    add.classList.remove('modal-overlay');
+    addTransactionModalOverlay.classList.remove('modal-overlay');
+};
+
+// Fetching
+const getApiCurrencies = async () => {
+    const response = await fetch(currenciesApi);
+    apiCurrenciesFound = await response.json();
+};
+
+const populateCurrencies = async () => {
+    const userUniqueCurrencies = {};
+
+    await getApiCurrencies();
+
+    currentUser.transactions.forEach((transaction) => {
+        userUniqueCurrencies[transaction.currency] = true;
+    });
+
+    for (const currency in userUniqueCurrencies) {
+        currencyFilter.innerHTML += `<option value="${currency}">${currency}</option>`;
+    }
+
+    apiCurrenciesFound.forEach((currency) => {
+        currencyInputOptions.innerHTML += `<option value="${currency.code}">${currency.code}</option>`;
+    });
 };
 
 // Add Transaction-Form Listener
@@ -230,4 +319,7 @@ addTransactionBtn.addEventListener('click', () => {
     showAddTransactionModal();
 });
 
-loadCurrentUser();
+getCurrentUser();
+populateDescriptionInput();
+populateCurrencies();
+populateTransactions(originalUserTransactions);

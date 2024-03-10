@@ -97,6 +97,10 @@ select {
   background-color: #1C2949;
 }
 
+option {
+  padding: 0 12px;
+}
+
 ::placeholder {
   color: #fafafa;
 }
