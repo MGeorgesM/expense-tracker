@@ -223,8 +223,10 @@ const populateTransaction = (transaction) => {
     // }
 
     const formattedDate = formatDate(transaction.date);
+    let transactionFormat = '';
+    transaction.type === 'Income' ? transactionFormat = 'income' : ''
 
-    transactionsContainer.innerHTML += `<tr>
+    transactionsContainer.innerHTML += `<tr class="${transactionFormat}">
                                             <td>${transaction.id}</td>
                                             <td>${transaction.type}</td>
                                             <td>${transaction.description}</td>
@@ -495,8 +497,8 @@ if (document.title === 'Dashboard') {
     logoutBtn.addEventListener('click', logout);
 
     getCurrentUser();
-    // calculateBalance();
+    calculateBalance();
     populateDescriptionInput();
-    // populateCurrencies();
+    populateCurrencies();
     populateTransactions(originalUserTransactions);
 }

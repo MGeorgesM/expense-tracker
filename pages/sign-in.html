@@ -9,13 +9,14 @@
     <link rel="stylesheet" href="/styles/signin-register.css">
     <link rel="stylesheet" href="/styles/utilities.css">
     <link rel="stylesheet" href="/styles/colors.css">
+    <link rel="stylesheet" href="/styles/queries.css">
     <title>Sign In</title>
 </head>
 
 <body>
     <section id="login-component" class="login-component flex column center">
-        <div class="container flex column center off-white-bg">
-            <a href="/index.html"><img class="logo" src="/assets/logo.png" alt="logo"></a>
+        <div class="container flex column center">
+            <a href="/pages/sign-in.html"><img class="logo" src="/assets/logo.png" alt="logo"></a>
             <form class="login-form flex center column" id="login-form">
                 <div class="form-group">
                     <input type="text" id="username" name="username" placeholder="Username" required>
@@ -23,7 +24,7 @@
                 <div class="form-group">
                     <input type="password" id="password" name="password" placeholder="Password" required>
                 </div>
-                <button class="login-btn primary-bg off-white-text" type="submit" id="login-btn">Login</button>
+                <button class="login-btn" type="submit" id="login-btn">Login</button>
             </form>
             <div class="validation">
                 <p id="validation"></p>
@@ -36,4 +37,5 @@
     <script src="/scripts/index.js"></script>
     <script src="/scripts/signin-register.js"></script>
 </body>
+
 </html>

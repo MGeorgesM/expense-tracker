@@ -1,5 +1,83 @@
-@media screen and (max-width:1344px) {}
+@media screen and (max-width:1344px) {
+    .hero-container {
+        max-width: 90%;
+    }
 
-@media screen and (max-width:944px) {}
+    .hero-container-inner {
+        align-items: left;
+        width: 100%;
+    }
 
-@media screen and (max-width:850px) {}
+    .main {
+        gap: 16px;
+        width: 95%;
+    }
+}
+
+@media screen and (max-width:944px) {
+    .hero-container {
+        max-width: 80%;
+    }
+
+    .main {
+        width: 100%;
+    }
+
+    .filters {
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+    }
+
+    table {
+        border-radius: 0;
+        padding: 0 4px;
+        font-size: 16px;
+    }
+}
+
+@media screen and (max-width:850px) {
+    .navbar {
+        max-width: 100%;
+        padding: 0 24px;
+    }
+
+    th,
+    td {
+        padding: 24px 4px;
+        text-align: left;
+    }
+
+    .filters input {
+        padding: 0 6px;
+        width: 30%;
+    }
+
+    .input-container {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+    }
+}
+
+@media screen and (max-width:600px) {
+
+    .nav-btn:link,
+    .nav-btn:visited {
+        padding: 12px 24px;
+    }
+
+    .hero-container {
+        max-width: 95%;
+    }
+
+    .hero-container h1,
+    p {
+        text-align: center;
+    }
+
+    .filters {
+        flex-direction: column;
+    }
+
+}

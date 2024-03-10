@@ -1,19 +1,11 @@
 .primary-text {
-    color: #fafafa;
+    color: #343a40;
 }
 
 .secondary-text {
-    color: #47526D;
+    color: #868e96;
 }
 
 .primary-bg {
-    background-color: #182341;
-}
-
-.primary-darker-bg {
-    background-color: #0C142C;
-}
-
-.primary-lighter-bg{
-    background-color: #1C2949;
+    background-color: #e6fcf5;
 }

@@ -56,20 +56,3 @@ ul {
 .box-shadow {
     box-shadow: 0 20px 20px 0 rgba(0, 0, 0, 0.1);
 }
-
-.btn:link,
-.btn:visited {
-    font-size: 20px;
-    font-weight: 600;
-    background-color: none;
-    border: 2px solid #fafafa;
-    color: #fafafa;
-    text-decoration: none;
-    display: inline-block;
-    padding: 16px 32px;
-    border-radius: 9px;
-}
-
-.btn:hover {
-    cursor: pointer;
-}

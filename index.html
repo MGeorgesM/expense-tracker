@@ -13,7 +13,7 @@
     <title>Dashboard</title>
 </head>
 
-<body class="primary-lighter-bg">
+<body>
     <header class="header">
         <section class="navbar flex space-between off-white-bg">
             <a href="#">
@@ -30,23 +30,24 @@
             <div class="hero-container flex">
                 <div class="hero-container-inner flex column primary-text">
                     <h1>Welcome <span id="user-greet">Georges</span></h1>
-                    <p>Your Current Balance is <span id="user-balance">10000.00</span><span> USD</span></p>
+                    <p class="secondary-text">Your Current Balance is <strong id="user-balance">10000.00</strong><span>
+                            USD</span></p>
                 </div>
             </div>
         </section>
     </header>
     <section class="main flex column center">
-        <div class="filters flex space-between primary-text">
+        <div class="filters flex primary-text">
             <div class="type-filters flex">
                 <i class="fa-solid fa-filter"></i>
                 <p>Filters:</p>
                 <span id="income-filter">Income</span>
                 <span id="expense-filter">Expenses</span>
             </div>
-            <div>
+            <div class="input-container">
                 <input type="number" id="amount-from-filter" placeholder="Amount from">
                 <input type="number" id="amount-to-filter" placeholder="Amount to">
-                <select id="currency-filter" class="primary-lighter-bg">
+                <select id="currency-filter">
                     <option value="All">All</option>
                 </select>
             </div>
@@ -69,9 +70,9 @@
         </div>
     </section>
     <section id="modal-bg">
-        <div class="hidden add-edit-transaction-modal center column primary-text primary-bg" id="add-transaction-modal">
-            <h3>Add a Transaction</h3>
-            <div class="add-edit-transaction-modal-content flex column center primary-bg">
+        <div class="hidden add-edit-transaction-modal center column" id="add-transaction-modal">
+            <h3 class="primary-text">Add a Transaction</h3>
+            <div class="add-edit-transaction-modal-content flex column center">
                 <input type="hidden" id="transactionId">
                 <input type="date" id="dateInput">
                 <input type="number" id="amountInput" placeholder="Amount">
@@ -79,10 +80,7 @@
                     <select id="descriptionInput"></select>
                 </div>
                 <div>
-                    <select id="currencyInput">
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
-                    </select>
+                    <select id="currencyInput"></select>
                 </div>
                 <div id="typeInput" class="type-input">
                     <div class="flex center">
@@ -103,14 +101,14 @@
             </div>
         </div>
     </section>
-    <div class="hidden confirmation-modal column center primary-text primary-bg" id="confirmation-modal">
+    <div class="hidden confirmation-modal column center primary-text" id="confirmation-modal">
         <h3>Are you sure?</h3>
         <div class="add-edit-transaction-modal-btns flex center">
             <button id="delete-transaction-btn" class="add-transaction-btn primary-bg">Yes</button>
             <button id="cancel-delete-transaction-btn" class="add-transaction-btn primary-bg">Cancel</button>
         </div>
     </div>
-    <div class="add-btn primary-bg primary-text flex center" id="add-transaction-btn">
+    <div class="add-btn primary-text flex center" id="add-transaction-btn">
         <i class="fa-solid fa-plus"></i>
     </div>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>

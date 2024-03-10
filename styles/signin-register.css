@@ -10,21 +10,18 @@ html {
 
 .login-component {
     height: 100vh;
-    /* background-image: linear-gradient(rgba(41, 41, 41, 0.5),
-            rgba(0, 0, 0, 0.5)),
-        url(/assets/loginregister.jpg);
-    background-size: cover; */
+    background-color: #087f5b;
     gap: 24px;
-}
-
-.register {
-    padding: 16px;
 }
 
 .register a:link,
 .register a:visited {
-    color: #cf711f;
+    color: #0ca678;
     text-decoration: none;
+}
+
+.register a:hover {
+    color: #099268;
 }
 
 .container {
@@ -32,8 +29,9 @@ html {
     min-width: 400px;
     padding: 16px;
     border-radius: 8px;
-    box-shadow: 0 20px 20px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 20px 0 rgba(0, 0, 0, 0.2);
     border: 1px solid #e9ecef;
+    background-color: #fafafa;
 }
 
 .logo {
@@ -51,11 +49,12 @@ html {
 }
 
 .login-btn {
-    padding-left: 4px;
+    color: #fafafa;
+    background-color: #0ca678;
 }
 
 .login-btn:hover {
-    background-color: #cf711f;
+    background-color: #099268;
 }
 
 input {
