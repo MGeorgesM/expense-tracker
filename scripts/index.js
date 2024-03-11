@@ -201,6 +201,7 @@ const populateTransactions = (transactions) => {
         notFoundPrompt.classList.remove('hidden');
         return;
     }
+    transactions.sort((a,b) => new Date(b.date) - new Date(a.date));
     transactionsTable.classList.remove('hidden');
     notFoundPrompt.classList.add('hidden');
     transactions.forEach((transaction) => {
