@@ -386,9 +386,9 @@ const convertAmount = async (from, to, amount) => {
 
 const populateCurrencies = async () => {
     const userUniqueCurrencies = {};
-    (currencyInput.innerHTML = ''),
-        (currencyFilter.innerHTML = `<option value="All">All</option>`),
-        await getApiCurrencies();
+    currencyInput.innerHTML = '';
+    currencyFilter.innerHTML = `<option value="All">All</option>`;
+    await getApiCurrencies();
 
     currentUser.transactions.forEach((transaction) => {
         userUniqueCurrencies[transaction.currency] = true;
@@ -433,7 +433,6 @@ if (document.title === 'Dashboard') {
     currencyFilter.addEventListener('change', () => {
         filters.currency = currencyFilter.value !== 'All' ? currencyFilter.value : null;
         filterTransactions();
-
         currencyFilter.value = filters.currency || 'All';
     });
 
@@ -445,7 +444,6 @@ if (document.title === 'Dashboard') {
     submitTransactionBtn.addEventListener('click', (event) => {
         event.preventDefault();
         const transactionid = transactionHiddenId.value;
-
         const transaction = createTransactionFromInput();
 
         transactionid ? editTransaction(transactionid, transaction) : addTransactionToUser(transaction);
@@ -465,7 +463,6 @@ if (document.title === 'Dashboard') {
 
     getCurrentUser();
     saveCurrentUser();
-    populateCurrencies();
     calculateBalance();
     populateDescriptionInput();
     populateTransactions(originalUserTransactions);
