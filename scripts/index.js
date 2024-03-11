@@ -9,7 +9,7 @@ const addTransactionModal = document.getElementById('add-transaction-modal');
 const cancelAddTransactionBtn = document.getElementById('cancel-add-transaction-btn');
 const notFoundPrompt = document.getElementById('not-found');
 
-const hiddenId = document.getElementById('transactionId');
+const transactionHiddenId = document.getElementById('transactionId');
 const dateInput = document.getElementById('dateInput');
 const amountInput = document.getElementById('amountInput');
 const descriptionInput = document.getElementById('descriptionInput');
@@ -101,8 +101,8 @@ const user1 = {
     ],
 };
 
-const currenciesApi = 'https://rich-erin-angler-hem.cyclic.app/students/available';
-const convertApi = 'https://rich-erin-angler-hem.cyclic.app/students/convert';
+const currenciesApi = 'https://dull-pink-sockeye-tie.cyclic.app/students/available';
+const convertApi = 'https://dull-pink-sockeye-tie.cyclic.app/students/convert';
 
 const getCurrentUser = () => {
     currentUser = JSON.parse(localStorage.getItem('currentUser')) || user1;
@@ -117,7 +117,7 @@ const saveCurrentUser = () => {
         storedUsers[index] = currentUser;
         localStorage.setItem('currentUser', JSON.stringify(storedUsers[index]));
     } else {
-        storedUsers.push(currentUser)
+        storedUsers.push(currentUser);
     }
     localStorage.setItem('users', JSON.stringify(storedUsers));
 };
@@ -155,7 +155,7 @@ const calculateBalance = async () => {
             try {
                 amount = await convertAmount(transaction.currency, 'USD', transaction.amount);
             } catch (error) {
-                console.error('Error converting amount:', error);
+                console.error('Error converting amount:', amount);
             }
         } else {
             amount = transaction.amount;
@@ -166,7 +166,7 @@ const calculateBalance = async () => {
 
     userBalanceDisplay.innerHTML = `${balance.toFixed(2)}`;
     currentUser.balance = balance;
-    saveCurrentUser()
+    saveCurrentUser();
 };
 
 const populateDescriptionInput = () => {
@@ -225,7 +225,7 @@ const handleEditTransaction = (event) => {
     const transactionId = event.target.dataset.id;
     const transaction = findTransactionById(transactionId);
 
-    hiddenId.value = transaction.id;
+    transactionHiddenId.value = transaction.id;
     dateInput.value = formatDate(transaction.date);
     amountInput.value = transaction.amount;
     descriptionInput.value = transaction.description;
@@ -260,29 +260,28 @@ const addTransactionToUser = async (transaction) => {
 };
 
 const createTransactionFromInput = () => {
-    const transactionId = document.getElementById('transactionId').value;
-    const dateInput = new Date(document.getElementById('dateInput').value);
-    const amountInput = parseFloat(document.getElementById('amountInput').value);
-    const descriptionInput = document.getElementById('descriptionInput').value;
-    const currencyInput = document.getElementById('currencyInput').value;
-    const typeInputs = document.getElementsByName('transaction-type');
+    const transactionIdValue = transactionHiddenId.value;
+    const dateInputValue = new Date(dateInput.value);
+    const amountInputValue = parseFloat(amountInput.value);
+    const descriptionInputValue = descriptionInput.value;
+    const currencyInputValue = currencyInput.value;
 
-    let selectedType = null;
+    let selectedTypeValue = null;
 
     for (const input of typeInputs) {
         if (input.checked) {
-            selectedType = input.value;
+            selectedTypeValue = input.value;
             break;
         }
     }
 
     return {
-        id: parseInt(transactionId) || getUniqueId(originalUserTransactions),
-        date: dateInput,
-        amount: amountInput,
-        currency: currencyInput,
-        description: descriptionInput,
-        type: selectedType,
+        id: parseInt(transactionIdValue) || getUniqueId(originalUserTransactions),
+        date: dateInputValue,
+        amount: amountInputValue,
+        currency: currencyInputValue,
+        description: descriptionInputValue,
+        type: selectedTypeValue,
     };
 };
 
@@ -445,7 +444,7 @@ if (document.title === 'Dashboard') {
 
     submitTransactionBtn.addEventListener('click', (event) => {
         event.preventDefault();
-        const transactionid = hiddenId.value;
+        const transactionid = transactionHiddenId.value;
 
         const transaction = createTransactionFromInput();
 
