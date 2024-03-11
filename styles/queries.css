@@ -1,5 +1,7 @@
 @media screen and (max-width:1344px) {
-    .hero-container {
+
+    .hero-container,
+    footer {
         max-width: 90%;
     }
 
@@ -15,6 +17,7 @@
 }
 
 @media screen and (max-width:944px) {
+
     .hero-container {
         max-width: 80%;
     }
@@ -33,6 +36,10 @@
         border-radius: 0;
         padding: 0 4px;
         font-size: 16px;
+    }
+
+    footer {
+        max-width: 95%;
     }
 }
 
